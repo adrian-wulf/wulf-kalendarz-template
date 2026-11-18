@@ -1,0 +1,5 @@
+route_id,route_short_name,route_long_name,route_type,route_color
+R4,4,Tramwaj 4,0,E30613
+R175,175,Autobus 175,3,
+RN,N32,Nocny,3,000000
+RM,M1,Metro,1,0000BB

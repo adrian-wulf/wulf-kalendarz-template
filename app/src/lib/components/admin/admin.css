@@ -1,0 +1,290 @@
+/* Wspólny wygląd sekcji panelu (dawniej styl jednej strony /admin): klasa `adm-sec` na <section>. */
+.adm-sec {
+	scroll-margin-top: 70px;
+	min-width: 0;
+}
+.adm-sec h2 {
+	font-family: var(--font-head);
+	font-size: 28px;
+	margin: 0 0 14px;
+}
+.adm-sec .preview {
+	aspect-ratio: 16 / 9;
+	max-width: 100%;
+	border-radius: 12px;
+	overflow: hidden;
+	border: 1px solid var(--line);
+	box-shadow: var(--shadow);
+}
+.adm-sec .preview iframe {
+	width: 100%;
+	height: 100%;
+	border: 0;
+	display: block;
+}
+.adm-sec .rows {
+	display: grid;
+	gap: 10px;
+}
+.adm-sec .row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px 14px;
+	align-items: end;
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-left: 6px solid var(--c, var(--line));
+	border-radius: 10px;
+	padding: 12px 14px;
+}
+.adm-sec .row.item {
+	align-items: center;
+}
+.adm-sec .row.new {
+	border-style: dashed;
+	border-left-style: solid;
+}
+.adm-sec .swatch {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: var(--c, var(--line));
+	align-self: center;
+}
+.adm-sec label {
+	display: grid;
+	gap: 4px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--muted);
+}
+.adm-sec .grow {
+	flex: 1 1 200px;
+}
+.adm-sec input,
+.adm-sec select {
+	font: 16px var(--font-body);
+	padding: 8px 10px;
+	border: 1px solid var(--line);
+	border-radius: 8px;
+	background: var(--bg);
+	color: var(--fg);
+	min-width: 0;
+}
+.adm-sec input[type='color'] {
+	width: 56px;
+	height: 38px;
+	padding: 2px;
+}
+.adm-sec button,
+.adm-sec .button {
+	font: 600 15px var(--font-body);
+	padding: 9px 14px;
+	border-radius: 8px;
+	border: 1px solid var(--line);
+	background: var(--event-bg);
+	color: var(--fg);
+	cursor: pointer;
+	text-decoration: none;
+	display: inline-block;
+}
+.adm-sec button:disabled {
+	opacity: 0.4;
+	cursor: default;
+}
+.adm-sec .primary {
+	background: var(--fg);
+	color: var(--card);
+	border-color: var(--fg);
+}
+.adm-sec .danger {
+	color: var(--alert);
+}
+.adm-sec .days {
+	display: flex;
+	gap: 6px;
+}
+.adm-sec .day {
+	display: flex;
+	gap: 4px;
+	align-items: center;
+	font-size: 14px;
+	color: var(--fg);
+}
+.adm-sec .steps {
+	display: grid;
+	gap: 14px;
+	padding-left: 22px;
+	margin: 0;
+}
+.adm-sec .steps li {
+	display: grid;
+	gap: 8px;
+}
+.adm-sec .steps li.done > b::after {
+	content: ' ✓';
+	color: #1f8a4c;
+}
+.adm-sec .inline {
+	display: inline;
+}
+.adm-sec .cals {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	gap: 10px;
+}
+.adm-sec .cal {
+	display: grid;
+	gap: 6px;
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	padding: 10px 12px;
+	color: var(--fg);
+	font-size: 15px;
+}
+.adm-sec code {
+	font-size: 13px;
+	background: var(--event-bg);
+	padding: 2px 6px;
+	border-radius: 4px;
+	user-select: all;
+}
+.adm-sec .bin-swatch {
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	border-radius: 3px;
+	background: var(--c);
+	margin: 0 4px 0 6px;
+	vertical-align: -1px;
+}
+.adm-sec .rules table input:not([type='color']) {
+	width: 100%;
+}
+.adm-sec .rules .actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 10px;
+}
+.adm-sec .chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+.adm-sec .chip {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-radius: 999px;
+	padding: 4px 4px 4px 14px;
+}
+.adm-sec .chip .x {
+	border-radius: 999px;
+	padding: 4px 10px;
+}
+.adm-sec .grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 14px;
+}
+.adm-sec fieldset {
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	background: var(--card);
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	padding: 12px 14px;
+}
+.adm-sec fieldset.wide {
+	grid-column: 1 / -1;
+}
+.adm-sec legend {
+	font-weight: 700;
+	padding: 0 6px;
+}
+.adm-sec .actions {
+	grid-column: 1 / -1;
+}
+.adm-sec table {
+	width: 100%;
+	border-collapse: collapse;
+	background: var(--card);
+	border-radius: 10px;
+	overflow: hidden;
+}
+.adm-sec th,
+.adm-sec td {
+	text-align: left;
+	padding: 10px 12px;
+	border-bottom: 1px solid var(--line);
+}
+.adm-sec .pill {
+	font-size: 13px;
+	font-weight: 700;
+	padding: 3px 10px;
+	border-radius: 999px;
+	background: var(--event-bg);
+}
+.adm-sec .pill.good {
+	background: #e3f4ea;
+	color: #1f8a4c;
+}
+.adm-sec .pill.bad {
+	background: #fde8e6;
+	color: #b42318;
+}
+.adm-sec .muted,
+.adm-sec .hint {
+	color: var(--muted);
+}
+.adm-sec .hint {
+	font-size: 14px;
+}
+.adm-sec .err {
+	color: var(--alert);
+	font-weight: 700;
+}
+.adm-sec .ok {
+	color: #1f8a4c;
+	font-weight: 700;
+}
+@media (max-width: 700px) {
+	.adm-sec table {
+		display: block;
+		overflow-x: auto;
+	}
+}
+.adm-sec h3 {
+	margin: 28px 0 10px;
+	font-size: 20px;
+}
+.adm-sec details.history {
+	margin: -4px 0 8px 16px;
+}
+.adm-sec details.history summary {
+	cursor: pointer;
+	color: var(--muted);
+	padding: 4px 0;
+}
+.adm-sec details.history .chips {
+	margin-top: 8px;
+}
+.adm-sec label.check {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 6px;
+}
+.adm-sec .status {
+	font-size: 13px;
+	color: var(--muted);
+	white-space: nowrap;
+}
+.adm-sec [hidden] {
+	display: none !important;
+}

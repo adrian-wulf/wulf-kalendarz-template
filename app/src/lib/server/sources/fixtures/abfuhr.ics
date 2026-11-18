@@ -1,0 +1,124 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example//Abfuhrkalender Demo//
+BEGIN:VEVENT
+UID:demo-1@abfuhr.example
+DTSTAMP:20261031T120000Z
+DTSTART:20261106T060000Z
+DTEND:20261106T070000Z
+CATEGORIES:Abfuhrkalender
+LOCATION:Musterstadt\, Musterstraße
+SUMMARY:Abfuhr Restabfall (14tägige und vierwöchentliche Abfuhr
+DESCRIPTION:Heute Abfuhr Restabfall (14tägige und vierwöchentliche Abfuhr in Musterstadt\, Musterstraße
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-2@abfuhr.example
+DTSTAMP:20261031T120000Z
+DTSTART:20261110T060000Z
+DTEND:20261110T070000Z
+CATEGORIES:Abfuhrkalender
+LOCATION:Musterstadt\, Musterstraße
+SUMMARY:Abfuhr Altpapier
+DESCRIPTION:Heute Abfuhr Altpapier in Musterstadt\, Musterstraße
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-3@abfuhr.example
+DTSTAMP:20261031T120000Z
+DTSTART:20261112T060000Z
+DTEND:20261112T070000Z
+CATEGORIES:Abfuhrkalender
+LOCATION:Musterstadt\, Musterstraße
+SUMMARY:Abfuhr Bioabfall
+DESCRIPTION:Heute Abfuhr Bioabfall in Musterstadt\, Musterstraße
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-4@abfuhr.example
+DTSTAMP:20261031T120000Z
+DTSTART:20261119T060000Z
+DTEND:20261119T070000Z
+CATEGORIES:Abfuhrkalender
+LOCATION:Musterstadt\, Musterstraße
+SUMMARY:Abfuhr Restabfall (14tägige Abfuhr)
+DESCRIPTION:Heute Abfuhr Restabfall (14tägige Abfuhr) in Musterstadt\, Musterstraße
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-5@abfuhr.example
+DTSTAMP:20261031T120000Z
+DTSTART:20261124T060000Z
+DTEND:20261124T070000Z
+CATEGORIES:Abfuhrkalender
+LOCATION:Musterstadt\, Musterstraße
+SUMMARY:Abfuhr Gelbe Tonne
+DESCRIPTION:Heute Abfuhr Gelbe Tonne in Musterstadt\, Musterstraße
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-6@abfuhr.example
+DTSTAMP:20261031T120000Z
+DTSTART:20261126T060000Z
+DTEND:20261126T070000Z
+CATEGORIES:Abfuhrkalender
+LOCATION:Musterstadt\, Musterstraße
+SUMMARY:Abfuhr Bioabfall
+DESCRIPTION:Heute Abfuhr Bioabfall in Musterstadt\, Musterstraße
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-7@abfuhr.example
+DTSTAMP:20261031T120000Z
+DTSTART:20261203T060000Z
+DTEND:20261203T070000Z
+CATEGORIES:Abfuhrkalender
+LOCATION:Musterstadt\, Musterstraße
+SUMMARY:Abfuhr Restabfall (14tägige und vierwöchentliche Abfuhr
+DESCRIPTION:Heute Abfuhr Restabfall (14tägige und vierwöchentliche Abfuhr in Musterstadt\, Musterstraße
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-8@abfuhr.example
+DTSTAMP:20261031T120000Z
+DTSTART:20261208T060000Z
+DTEND:20261208T070000Z
+CATEGORIES:Abfuhrkalender
+LOCATION:Musterstadt\, Musterstraße
+SUMMARY:Abfuhr Altpapier
+DESCRIPTION:Heute Abfuhr Altpapier in Musterstadt\, Musterstraße
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-9@abfuhr.example
+DTSTAMP:20261031T120000Z
+DTSTART:20261210T060000Z
+DTEND:20261210T070000Z
+CATEGORIES:Abfuhrkalender
+LOCATION:Musterstadt\, Musterstraße
+SUMMARY:Abfuhr Bioabfall
+DESCRIPTION:Heute Abfuhr Bioabfall in Musterstadt\, Musterstraße
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-10@abfuhr.example
+DTSTAMP:20261031T120000Z
+DTSTART:20261217T060000Z
+DTEND:20261217T070000Z
+CATEGORIES:Abfuhrkalender
+LOCATION:Musterstadt\, Musterstraße
+SUMMARY:Abfuhr Restabfall (14tägige Abfuhr)
+DESCRIPTION:Heute Abfuhr Restabfall (14tägige Abfuhr) in Musterstadt\, Musterstraße
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-11@abfuhr.example
+DTSTAMP:20261031T120000Z
+DTSTART:20261222T060000Z
+DTEND:20261222T070000Z
+CATEGORIES:Abfuhrkalender
+LOCATION:Musterstadt\, Musterstraße
+SUMMARY:Abfuhr Gelbe Tonne (verschoben)
+DESCRIPTION:Heute Abfuhr Gelbe Tonne (verschoben) in Musterstadt\, Musterstraße
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-12@abfuhr.example
+DTSTAMP:20261031T120000Z
+DTSTART:20261223T060000Z
+DTEND:20261223T070000Z
+CATEGORIES:Abfuhrkalender
+LOCATION:Musterstadt\, Musterstraße
+SUMMARY:Abfuhr Bioabfall (verschoben)
+DESCRIPTION:Heute Abfuhr Bioabfall (verschoben) in Musterstadt\, Musterstraße
+END:VEVENT
+END:VCALENDAR

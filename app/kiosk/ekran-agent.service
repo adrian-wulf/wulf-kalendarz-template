@@ -1,0 +1,14 @@
+[Unit]
+Description=Agent ekranu kiosku (tryb nocny, budzenie dotykiem)
+After=network-online.target docker.service
+
+[Service]
+# KIOSK_PORT (i opcjonalnie KIOSK_DISPLAY_URL, KIOSK_TOUCH) z pliku zapisanego przez install.sh.
+Environment=KIOSK_PORT=3000
+EnvironmentFile=-/etc/kiosk/kiosk.conf
+ExecStart=/usr/bin/python3 /usr/local/lib/kiosk/ekran-agent.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

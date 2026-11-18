@@ -1,0 +1,89 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example//Harmonogram wywozu odpadów Demo//PL
+X-WR-CALNAME:Harmonogram wywozu odpadów – Przykładowo\, ul. Przykładowa
+BEGIN:VEVENT
+UID:demo-1@harmonogram.example
+DTSTAMP:20261031T120000Z
+DTSTART;VALUE=DATE:20261103
+SUMMARY:Odpady zmieszane
+LOCATION:Przykładowo\, ul. Przykładowa 1
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-2@harmonogram.example
+DTSTAMP:20261031T120000Z
+DTSTART;VALUE=DATE:20261105
+SUMMARY:Bioodpady
+LOCATION:Przykładowo\, ul. Przykładowa 1
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-3@harmonogram.example
+DTSTAMP:20261031T120000Z
+DTSTART;VALUE=DATE:20261110
+SUMMARY:Odpady zmieszane (zabudowa jednorodzinna)
+LOCATION:Przykładowo\, ul. Przykładowa 1
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-4@harmonogram.example
+DTSTAMP:20261031T120000Z
+DTSTART;VALUE=DATE:20261110
+SUMMARY:Odpady zmieszane
+LOCATION:Przykładowo\, ul. Przykładowa 1
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-5@harmonogram.example
+DTSTAMP:20261031T120000Z
+DTSTART;VALUE=DATE:20261110
+SUMMARY:Metale i tworzywa sztuczne
+LOCATION:Przykładowo\, ul. Przykładowa 1
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-6@harmonogram.example
+DTSTAMP:20261031T120000Z
+DTSTART;VALUE=DATE:20261112
+SUMMARY:Papier
+LOCATION:Przykładowo\, ul. Przykładowa 1
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-7@harmonogram.example
+DTSTAMP:20261031T120000Z
+DTSTART;TZID=Europe/Warsaw:20261117T060000
+SUMMARY:ODPADY ZMIESZANE
+LOCATION:Przykładowo\, ul. Przykładowa 1
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-8@harmonogram.example
+DTSTAMP:20261031T120000Z
+DTSTART;VALUE=DATE:20261119
+SUMMARY:Szkło
+LOCATION:Przykładowo\, ul. Przykładowa 1
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-9@harmonogram.example
+DTSTAMP:20261031T120000Z
+DTSTART;VALUE=DATE:20261120
+SUMMARY:Mobilny PSZOK – elektroodpady i chemikalia
+LOCATION:Przykładowo\, ul. Przykładowa 1
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-10@harmonogram.example
+DTSTAMP:20261031T120000Z
+DTSTART:20261123T230000Z
+SUMMARY:Metale i tworzywa sztuczne
+LOCATION:Przykładowo\, ul. Przykładowa 1
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-11@harmonogram.example
+DTSTAMP:20261031T120000Z
+DTSTART;VALUE=DATE:20261126
+SUMMARY:Odpady zielone (sezonowo)
+LOCATION:Przykładowo\, ul. Przykładowa 1
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-12@harmonogram.example
+DTSTAMP:20261031T120000Z
+DTSTART;VALUE=DATE:20261128
+SUMMARY:Odpady wielkogabarytowe
+LOCATION:Przykładowo\, ul. Przykładowa 1
+END:VEVENT
+END:VCALENDAR

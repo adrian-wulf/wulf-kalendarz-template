@@ -1,0 +1,7 @@
+﻿stop_id,stop_name,stop_code,location_type,parent_station
+S1,Rondo Przykładowe,,1,
+S1a,Rondo Przykładowe,01,0,S1
+S1b,Rondo Przykładowe,02,0,S1
+S2,Plac Testowy,,0,
+S3,Dworzec Wzorcowy,,0,
+S4,Metro Testowe,,0,

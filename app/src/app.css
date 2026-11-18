@@ -1,0 +1,67 @@
+@import '@fontsource-variable/fraunces/opsz.css';
+@import '@fontsource-variable/inter/index.css';
+
+/* Motyw „Papier” – zapas; właściwe tokeny wstrzykuje +layout (patrz lib/theme.ts) */
+:root {
+	--bg: #f4efe6;
+	--card: #fffdf8;
+	--fg: #2a2522;
+	--muted: #6e6458;
+	--line: #e9e1d4;
+	--event-bg: #f7f2ea;
+	--note: #fff3b0;
+	--alert: #b8352a;
+	--accent: #2a2522;
+	--radius: 14px;
+	--radius-s: 8px;
+	--shadow: 0 1px 3px rgba(60, 40, 20, 0.08);
+	--font-head: 'Fraunces Variable', Georgia, serif;
+	--font-body: 'Inter Variable', 'Noto Sans', sans-serif;
+	--font-emoji: 'Noto Color Emoji', 'Apple Color Emoji', sans-serif;
+}
+
+/* Wieczór: ten sam styl, przyciemniony */
+:root[data-phase='evening'],
+:root[data-phase='night'] {
+	--bg: #2b2621;
+	--card: #36302a;
+	--fg: #f1e9dc;
+	--muted: #b9ac99;
+	--line: #4a4239;
+	--event-bg: #403830;
+	--note: #5a5030;
+	--alert: #ff8f80;
+	--accent: #f1e9dc;
+	--shadow: none;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	height: 100%;
+	background: var(--bg);
+	color: var(--fg);
+	font-family: var(--font-body), var(--font-emoji);
+	overflow: hidden;
+	-webkit-user-select: none;
+	user-select: none;
+	-webkit-tap-highlight-color: transparent;
+}
+
+body.kiosk {
+	cursor: none;
+}
+
+/* Telefon: zwykłe przewijanie i zaznaczanie tekstu */
+html.phone,
+html.phone body {
+	overflow: auto;
+	height: auto;
+	min-height: 100%;
+	-webkit-user-select: auto;
+	user-select: auto;
+}

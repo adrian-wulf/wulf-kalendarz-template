@@ -1,0 +1,176 @@
+{
+	"departures": [
+		{
+			"tripId": "1|60678|4|86|12112026",
+			"when": "2026-11-12T16:35:00+01:00",
+			"plannedWhen": "2026-11-12T16:33:00+01:00",
+			"delay": 120,
+			"platform": "Pos. 15",
+			"plannedPlatform": "Pos. 15",
+			"direction": "S Hackescher Markt",
+			"line": {
+				"type": "line",
+				"id": "de-vbb-11000000-tram-m4",
+				"name": "M4",
+				"product": "tram",
+				"productName": "Tram",
+				"mode": "train",
+				"color": {
+					"fg": "#fff",
+					"bg": "#CA1214"
+				}
+			},
+			"stop": {
+				"type": "stop",
+				"id": "900100026",
+				"name": "S+U Alexanderplatz Bhf/Gontardstr. (Berlin)"
+			}
+		},
+		{
+			"tripId": "1|41224|4|86|12112026",
+			"when": "2026-11-12T16:36:00+01:00",
+			"plannedWhen": "2026-11-12T16:19:00+01:00",
+			"delay": 1020,
+			"platform": "Pos. 17",
+			"plannedPlatform": "Pos. 17",
+			"direction": "U Breitenbachplatz via S Südkreuz",
+			"line": {
+				"type": "line",
+				"id": "de-vbb-11000000-bus-248",
+				"name": "248",
+				"product": "bus",
+				"productName": "Bus",
+				"mode": "bus"
+			},
+			"stop": {
+				"type": "stop",
+				"id": "900100711",
+				"name": "S+U Alexanderpl./Grunerstr.(Bln) [Grunerstr.]"
+			}
+		},
+		{
+			"tripId": "1|61943|2|86|12112026",
+			"when": "2026-11-12T16:36:00+01:00",
+			"plannedWhen": "2026-11-12T16:34:00+01:00",
+			"delay": 120,
+			"platform": "1 (U2)",
+			"plannedPlatform": "1 (U2)",
+			"direction": "Ruhleben",
+			"line": {
+				"type": "line",
+				"id": "de-vbb-11000000-u-bahn-u2",
+				"name": "U2",
+				"product": "subway",
+				"productName": "U",
+				"mode": "train",
+				"color": {
+					"fg": "#fff",
+					"bg": "#e75313"
+				}
+			},
+			"stop": {
+				"type": "stop",
+				"id": "900100003",
+				"name": "S+U Alexanderplatz Bhf (Berlin)"
+			}
+		},
+		{
+			"tripId": "1|62662|4|86|12112026",
+			"when": "2026-11-12T16:37:00+01:00",
+			"plannedWhen": "2026-11-12T16:34:00+01:00",
+			"delay": 180,
+			"platform": "1 (U5)",
+			"plannedPlatform": "1 (U5)",
+			"direction": "Hauptbahnhof",
+			"line": {
+				"type": "line",
+				"id": "de-vbb-11000000-u-bahn-u5",
+				"name": "U5",
+				"product": "subway",
+				"productName": "U",
+				"mode": "train",
+				"color": {
+					"fg": "#fff",
+					"bg": "#805233"
+				}
+			},
+			"stop": {
+				"type": "stop",
+				"id": "900100003",
+				"name": "S+U Alexanderplatz Bhf (Berlin)"
+			}
+		},
+		{
+			"tripId": "1|39025|9|86|12112026",
+			"when": "2026-11-12T16:38:00+01:00",
+			"plannedWhen": "2026-11-12T16:28:00+01:00",
+			"delay": 600,
+			"platform": "Pos. 1",
+			"plannedPlatform": "Pos. 1",
+			"direction": "S+U Zoologischer Garten via Potsdamer Platz",
+			"line": {
+				"type": "line",
+				"id": "de-vbb-11000000-bus-200",
+				"name": "200",
+				"product": "bus",
+				"productName": "Bus",
+				"mode": "bus"
+			},
+			"stop": {
+				"type": "stop",
+				"id": "900100031",
+				"name": "S+U Alexanderplatz Bhf/Memhardstr. (Berlin)"
+			}
+		},
+		{
+			"tripId": "1|38996|5|86|12112026",
+			"when": "2026-11-12T16:39:00+01:00",
+			"plannedWhen": "2026-11-12T16:31:00+01:00",
+			"delay": 480,
+			"platform": "Pos. 24",
+			"plannedPlatform": "Pos. 24",
+			"direction": "Prenzlauer Berg, Michelangelostr.",
+			"line": {
+				"type": "line",
+				"id": "de-vbb-11000000-bus-200",
+				"name": "200",
+				"product": "bus",
+				"productName": "Bus",
+				"mode": "bus"
+			},
+			"stop": {
+				"type": "stop",
+				"id": "900100031",
+				"name": "S+U Alexanderplatz Bhf/Memhardstr. (Berlin)"
+			}
+		},
+		{
+			"tripId": "cancelled-1",
+			"when": null,
+			"plannedWhen": "2026-11-12T16:45:00+01:00",
+			"delay": null,
+			"platform": "1 (U5)",
+			"plannedPlatform": "1 (U5)",
+			"direction": "Wittenau",
+			"line": {
+				"type": "line",
+				"id": "u8",
+				"name": "U8",
+				"product": "subway",
+				"productName": "U",
+				"mode": "train",
+				"color": {
+					"fg": "#fff",
+					"bg": "#805233"
+				}
+			},
+			"stop": {
+				"type": "stop",
+				"id": "900100003",
+				"name": "S+U Alexanderplatz Bhf (Berlin)"
+			},
+			"cancelled": true
+		}
+	],
+	"realtimeDataUpdatedAt": 1794497594
+}

@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Plac zabaw</title>
+<style>
+  html, body { margin:0; height:100%; overflow:hidden; background:#fff8ec; font-family:"Noto Sans",sans-serif; user-select:none; -webkit-user-select:none; touch-action:none; cursor:none; }
+  canvas { position:fixed; inset:0; display:block; }
+  .screen { position:fixed; inset:0; }
+  #home { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:40px; background:linear-gradient(#87ceeb, #c9ecff 60%, #7cc35a 60%, #5a9e3c); }
+  #home h1 { margin:0; font-size:84px; color:#fff; text-shadow:6px 6px 0 #2b5b1a; letter-spacing:.04em; }
+  #tiles { display:grid; grid-template-columns:repeat(5, 230px); gap:30px; }
+  .tile { height:200px; border-radius:30px; border:8px solid #fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:100px; box-shadow:0 10px 0 rgba(0,0,0,.2); transition:transform .08s; }
+  .tile span { font-size:28px; font-weight:800; color:#2a2522; margin-top:4px; }
+  .tile:active { transform:scale(.93); }
+  #homeBtn { position:fixed; top:20px; left:20px; z-index:50; width:110px; height:110px; border-radius:28px; border:7px solid #fff; background:#ffe08a; font-size:60px; box-shadow:0 7px 0 rgba(0,0,0,.2); display:none; }
+  #homeBtn:active { transform:scale(.92); }
+  #calBtn { position:fixed; top:20px; left:20px; z-index:50; width:110px; height:110px; border-radius:28px; border:7px solid #fff; background:#bfe3ff; font-size:60px; box-shadow:0 7px 0 rgba(0,0,0,.2); display:grid; place-items:center; text-decoration:none; }
+  #volBtn { position:fixed; top:20px; left:150px; z-index:50; height:110px; padding:0 22px; border-radius:28px; border:7px solid #fff; background:#bde0ff; font-size:56px; box-shadow:0 7px 0 rgba(0,0,0,.2); display:flex; align-items:center; gap:12px; }
+  #volBtn:active { transform:scale(.92); }
+  #volPanel { position:fixed; top:150px; left:20px; z-index:60; background:#fff; border-radius:30px; padding:26px 34px; box-shadow:0 10px 0 rgba(0,0,0,.2), 0 0 0 7px #bde0ff; display:none; align-items:center; gap:22px; font-size:56px; }
+  #volPanel.open { display:flex; }
+  #volPanel span.pct { font-size:40px; font-weight:800; width:110px; text-align:right; color:#2a2522; font-variant-numeric:tabular-nums; }
+  #volSlider { -webkit-appearance:none; appearance:none; width:640px; height:44px; border-radius:22px; background:linear-gradient(90deg,#4caf50 var(--v),#e3e3e3 var(--v)); outline:none; }
+  #volSlider::-webkit-slider-thumb { -webkit-appearance:none; width:84px; height:84px; border-radius:50%; background:#fff; border:8px solid #2a2522; box-shadow:0 4px 0 rgba(0,0,0,.25); }
+  .side { position:fixed; z-index:40; }
+  .roundBtn { width:96px; height:96px; border-radius:50%; border:6px solid #fff; font-size:48px; box-shadow:0 6px 0 rgba(0,0,0,.18); }
+  .pop { position:fixed; pointer-events:none; font-size:120px; transform:translate(-50%,-50%) scale(.2); animation:pop 1.6s ease-out forwards; z-index:30; }
+  @keyframes pop { 30% { transform:translate(-50%,-50%) scale(1.2) rotate(-8deg); } 60% { transform:translate(-50%,-60%) scale(1) rotate(6deg); opacity:1; } 100% { transform:translate(-50%,-140%) scale(.8); opacity:0; } }
+  /* Hotbar jak w Minecrafcie */
+  #hotbar { position:fixed; left:50%; bottom:14px; transform:translateX(-50%); display:flex; gap:6px; padding:8px; background:rgba(40,40,40,.75); border:5px solid #1b1b1b; z-index:40; }
+  #hotbar canvas { position:static; width:84px; height:84px; image-rendering:pixelated; border:5px solid #8b8b8b; background:#555; }
+  #hotbar canvas.on { border-color:#fff; transform:translateY(-8px); }
+  /* Pary */
+  #memory { display:grid; grid-template-columns:repeat(6, 210px); gap:26px; justify-content:center; align-content:center; height:100%; background:#6b4f2e url() ; }
+  .card { height:210px; perspective:800px; }
+  .card .in { position:relative; width:100%; height:100%; transition:transform .45s; transform-style:preserve-3d; }
+  .card.open .in { transform:rotateY(180deg); }
+  .card .f, .card .b { position:absolute; inset:0; backface-visibility:hidden; border-radius:18px; border:7px solid #2a2a2a; display:flex; align-items:center; justify-content:center; }
+  .card .b { image-rendering:pixelated; background-size:cover; }
+  .card .f { transform:rotateY(180deg); background:#fffdf3; font-size:130px; }
+  .card.done .f { background:#c8f5b8; }
+  #counter { position:fixed; top:24px; right:30px; z-index:40; display:flex; gap:22px; font-size:52px; font-weight:800; color:#fff; text-shadow:4px 4px 0 #000; }
+</style>
+</head>
+<body>
+<div id="home" class="screen">
+  <h1>⛏️ PLAC ZABAW</h1>
+  <div id="tiles"></div>
+</div>
+<button id="homeBtn">🏠</button>
+<a id="calBtn" href="/" aria-label="Kalendarz">📅</a>
+<button id="volBtn"><span class="ic">🔉</span></button>
+<div id="volPanel"><span>🔈</span><input id="volSlider" type="range" min="0" max="100" step="1"><span>🔊</span><span class="pct"></span></div>
+<div id="game" class="screen" style="display:none"></div>
+
+<script>
+// ===== Dźwięk z regulacją głośności (0 = cisza … 3 = głośno) =====
+let vol = 30; // 0–100
+try { const v = localStorage.getItem('vol100'); if (v !== null && +v >= 0 && +v <= 100) vol = +v; } catch {}
+const gainFor = (v) => Math.pow(v / 100, 2);
+let ac, master;
+function showVol() {
+  document.querySelector('#volBtn .ic').textContent = vol === 0 ? '🔇' : vol < 35 ? '🔈' : vol < 70 ? '🔉' : '🔊';
+  const s = document.getElementById('volSlider'); s.value = vol; s.style.setProperty('--v', vol + '%');
+  document.querySelector('#volPanel .pct').textContent = vol + '%';
+}
+function tone(freq, dur = 0.25, type = 'sine', vol = 0.15) {
+  if (!ac) { ac = new AudioContext(); master = ac.createGain(); master.gain.value = gainFor(vol); master.connect(ac.destination); }
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.setValueAtTime(vol, ac.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
+  o.connect(g).connect(master); o.start(); o.stop(ac.currentTime + dur);
+}
+function noise(dur = 0.6, vol = 0.3) {
+  if (!ac) tone(1, 0.01, 'sine', 0);
+  const buf = ac.createBuffer(1, ac.sampleRate * dur, ac.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2);
+  const s = ac.createBufferSource(), g = ac.createGain(), f = ac.createBiquadFilter();
+  f.type = 'lowpass'; f.frequency.value = 900; g.gain.value = vol;
+  s.buffer = buf; s.connect(f).connect(g).connect(master); s.start();
+}
+const SCALE = [262, 294, 330, 349, 392, 440, 494, 523, 587, 659];
+const noteFor = (x) => SCALE[Math.min(SCALE.length - 1, Math.floor(x / innerWidth * SCALE.length))];
+
+// ===== Tekstury bloków (16×16, generowane) =====
+function rng(seed) { return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+function tex(draw, seed = 7) {
+  const c = document.createElement('canvas'); c.width = c.height = 16;
+  const x = c.getContext('2d'), r = rng(seed);
+  const px = (i, j, col) => { x.fillStyle = col; x.fillRect(i, j, 1, 1); };
+  draw(px, r, x); return c;
+}
+const shade = (cols, r) => cols[Math.floor(r() * cols.length)];
+const BLOCKS = {
+  grass: { name:'Trawa', t: tex((p, r) => { for (let j = 0; j < 16; j++) for (let i = 0; i < 16; i++) p(i, j, j < 4 + (r() < .4 ? 1 : 0) ? shade(['#5fa83a','#6dbb45','#53962f'], r) : shade(['#866043','#79553a','#946c4c'], r)); }, 3) },
+  dirt:  { name:'Ziemia', t: tex((p, r) => { for (let j = 0; j < 16; j++) for (let i = 0; i < 16; i++) p(i, j, shade(['#866043','#79553a','#946c4c','#6b4a30'], r)); }, 5) },
+  stone: { name:'Kamień', t: tex((p, r) => { for (let j = 0; j < 16; j++) for (let i = 0; i < 16; i++) p(i, j, shade(['#8a8a8a','#7d7d7d','#979797','#6f6f6f'], r)); }, 9) },
+  wood:  { name:'Drewno', t: tex((p, r) => { for (let j = 0; j < 16; j++) for (let i = 0; i < 16; i++) p(i, j, (i % 5 === 0) ? '#4f3a22' : shade(['#6b5030','#745733','#5e4529'], r)); }, 11) },
+  leaves:{ name:'Liście', t: tex((p, r) => { for (let j = 0; j < 16; j++) for (let i = 0; i < 16; i++) p(i, j, r() < .15 ? '#2c5a1a' : shade(['#3f8a26','#4a9a2e','#367a20'], r)); }, 13) },
+  planks:{ name:'Deski', t: tex((p, r) => { for (let j = 0; j < 16; j++) for (let i = 0; i < 16; i++) p(i, j, j % 4 === 3 ? '#7a5c34' : shade(['#b8945a','#c29f63','#a98650'], r)); }, 17) },
+  glass: { name:'Szkło', t: tex((p, r, x) => { x.fillStyle = 'rgba(200,235,255,.35)'; x.fillRect(0,0,16,16); for (let i = 0; i < 16; i++) { p(i,0,'#dff4ff'); p(i,15,'#dff4ff'); p(0,i,'#dff4ff'); p(15,i,'#dff4ff'); } p(4,4,'#fff'); p(5,5,'#fff'); p(6,6,'#fff'); p(10,3,'#fff'); }, 19) },
+  water: { name:'Woda', t: tex((p, r) => { for (let j = 0; j < 16; j++) for (let i = 0; i < 16; i++) p(i, j, shade(['#3a6fe0','#3466d4','#4579ea'], r)); }, 21) },
+  gold:  { name:'Złoto', t: tex((p, r) => { for (let j = 0; j < 16; j++) for (let i = 0; i < 16; i++) p(i, j, shade(['#f7d33c','#ffe169','#e8b923'], r)); for (let i = 0; i < 16; i++) { p(i,0,'#fff3a6'); p(0,i,'#fff3a6'); } }, 23) },
+  diamond:{ name:'Diament', t: tex((p, r) => { for (let j = 0; j < 16; j++) for (let i = 0; i < 16; i++) p(i, j, shade(['#5fe6dd','#7cf2ea','#45cfc6'], r)); for (let i = 0; i < 16; i++) { p(i,0,'#d4fffb'); p(0,i,'#d4fffb'); } }, 25) },
+  tnt:   { name:'TNT', t: tex((p, r, x) => { for (let j = 0; j < 16; j++) for (let i = 0; i < 16; i++) p(i, j, j >= 6 && j <= 9 ? '#eee' : (i % 4 === 0 ? '#a02a1e' : '#d6382a')); x.fillStyle = '#111'; x.font = 'bold 5px monospace'; x.fillText('TNT', 3, 10); }, 27) },
+};
+// Rudy w kamieniu (do Kopalni)
+function oreTex(col, seed) { return tex((p, r) => { for (let j = 0; j < 16; j++) for (let i = 0; i < 16; i++) p(i, j, shade(['#8a8a8a','#7d7d7d','#979797'], r)); for (let k = 0; k < 5; k++) { const cx = 2 + Math.floor(r() * 11), cy = 2 + Math.floor(r() * 11); p(cx, cy, col); p(cx + 1, cy, col); p(cx, cy + 1, col); } }, seed); }
+const ORES = {
+  stone:   { t: BLOCKS.stone.t },
+  coal:    { t: oreTex('#222', 31), icon: '⚫', freq: 523 },
+  iron:    { t: oreTex('#d8af93', 33), icon: '🟤', freq: 587 },
+  gold:    { t: oreTex('#f7d33c', 35), icon: '🟡', freq: 659 },
+  diamond: { t: oreTex('#5fe6dd', 37), icon: '💎', freq: 784 },
+  emerald: { t: oreTex('#17dd62', 39), icon: '💚', freq: 880 },
+};
+
+// ===== Silnik: menu i gry =====
+const game = document.getElementById('game'), home = document.getElementById('home'), homeBtn = document.getElementById('homeBtn');
+let cleanup = null, raf = 0;
+const calBtn = document.getElementById('calBtn');
+function goHome() { calBtn.style.display = 'grid'; volPanel.classList.remove('open'); if (cleanup) cleanup(); cleanup = null; cancelAnimationFrame(raf); game.innerHTML = ''; game.style.display = 'none'; homeBtn.style.display = 'none'; home.style.display = 'flex'; tone(392, .12, 'triangle'); }
+homeBtn.addEventListener('pointerdown', e => { e.stopPropagation(); goHome(); });
+const volPanel = document.getElementById('volPanel'), volSlider = document.getElementById('volSlider');
+let volClose;
+document.getElementById('volBtn').addEventListener('pointerdown', e => { e.stopPropagation(); volPanel.classList.toggle('open'); clearTimeout(volClose); volClose = setTimeout(() => volPanel.classList.remove('open'), 6000); });
+volPanel.addEventListener('pointerdown', e => e.stopPropagation());
+let lastBeep = 0;
+volSlider.addEventListener('input', () => {
+  vol = +volSlider.value; showVol();
+  try { localStorage.setItem('vol100', vol); } catch {}
+  if (master) master.gain.value = gainFor(vol);
+  clearTimeout(volClose); volClose = setTimeout(() => volPanel.classList.remove('open'), 6000);
+  const now = performance.now(); if (now - lastBeep > 150 && vol > 0) { lastBeep = now; tone(660, .1, 'triangle', .25); }
+});
+showVol();
+function start(g) { calBtn.style.display = 'none'; home.style.display = 'none'; game.style.display = 'block'; homeBtn.style.display = 'block'; tone(660, .12, 'triangle'); cleanup = g.run(game); }
+function makeCanvas(parent, bg) { const c = document.createElement('canvas'); c.width = innerWidth; c.height = innerHeight; if (bg) c.style.background = bg; parent.appendChild(c); return c; }
+function listen(el, type, fn) { el.addEventListener(type, fn); return () => el.removeEventListener(type, fn); }
+function loop(fn) { const step = () => { fn(); raf = requestAnimationFrame(step); }; raf = requestAnimationFrame(step); }
+function popEmoji(x, y, ch, size) { const d = document.createElement('div'); d.className = 'pop'; d.textContent = ch; if (size) d.style.fontSize = size + 'px'; d.style.left = x + 'px'; d.style.top = y + 'px'; document.body.appendChild(d); setTimeout(() => d.remove(), 1700); }
+
+// Cząsteczki wspólne
+function particles() {
+  const list = [];
+  return {
+    burst(x, y, n, opts = {}) { const h0 = Math.random() * 360; for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = (opts.speed || 6) * (.4 + Math.random()); list.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - (opts.up || 0), life: 1, h: (h0 + Math.random() * 80) % 360, e: opts.emoji && opts.emoji[Math.floor(Math.random() * opts.emoji.length)], col: opts.colors && opts.colors[Math.floor(Math.random() * opts.colors.length)], size: opts.size || (opts.emoji ? 40 + Math.random() * 30 : 6 + Math.random() * 6), sq: opts.square }); } },
+    draw(cx) { for (let i = list.length - 1; i >= 0; i--) { const p = list[i]; p.x += p.vx; p.y += p.vy; p.vy += .18; p.vx *= .985; p.life -= .013; if (p.life <= 0) { list.splice(i, 1); continue; } cx.globalAlpha = p.life; if (p.e) { cx.font = `${p.size}px "Noto Color Emoji"`; cx.fillText(p.e, p.x, p.y); } else { cx.fillStyle = p.col || `hsl(${p.h} 95% 60%)`; if (p.sq) cx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size); else { cx.beginPath(); cx.arc(p.x, p.y, p.size * p.life + 1, 0, Math.PI * 2); cx.fill(); } } cx.globalAlpha = 1; } },
+    clear() { list.length = 0; }
+  };
+}
+
+// ---------- 1. Budowanie (Minecraft) ----------
+const Build = { icon:'🧱', name:'Budowanie', bg:'#9fd8ff', run(root) {
+  const cv = makeCanvas(root), cx = cv.getContext('2d'); cx.imageSmoothingEnabled = false;
+  const S = 72, COLS = Math.ceil(innerWidth / S), ROWS = Math.ceil(innerHeight / S);
+  const grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+  const ground = ROWS - 4;
+  for (let c = 0; c < COLS; c++) { grid[ground][c] = 'grass'; for (let r = ground + 1; r < ROWS; r++) grid[r][c] = r < ground + 2 ? 'dirt' : 'stone'; }
+  const tx = 5; for (let r = ground - 4; r < ground; r++) grid[r][tx] = 'wood';
+  for (let r = ground - 6; r < ground - 3; r++) for (let c = tx - 2; c <= tx + 2; c++) if (!grid[r][c]) grid[r][c] = 'leaves';
+  const fuses = new Map(); // "r,c" -> czas wybuchu
+  const P = particles();
+  const tools = ['grass','dirt','stone','wood','planks','leaves','glass','water','gold','diamond','tnt','pick'];
+  let tool = 'grass';
+  const bar = document.createElement('div'); bar.id = 'hotbar'; root.appendChild(bar);
+  tools.forEach(t => {
+    const c = document.createElement('canvas'); c.width = c.height = 16; const x = c.getContext('2d');
+    if (t === 'pick') { x.font = '13px "Noto Color Emoji"'; x.fillText('⛏️', 0, 13); } else x.drawImage(BLOCKS[t].t, 0, 0);
+    c.addEventListener('pointerdown', e => { e.stopPropagation(); tool = t; [...bar.children].forEach(k => k.classList.toggle('on', k === c)); tone(880, .06, 'square', .05); });
+    if (t === tool) c.classList.add('on'); bar.appendChild(c);
+  });
+  const clouds = Array.from({ length: 5 }, (_, i) => ({ x: i * 420 + Math.random() * 200, y: 60 + Math.random() * 160, w: 3 + Math.floor(Math.random() * 3) }));
+  let painting = false, lastCell = '';
+  function act(x, y, first) {
+    const c = Math.floor(x / S), r = Math.floor(y / S);
+    if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return;
+    const k = r + ',' + c; if (!first && k === lastCell) return; lastCell = k;
+    if (tool === 'pick') {
+      const b = grid[r][c]; if (!b) return;
+      if (b === 'tnt' && !fuses.has(k)) { fuses.set(k, performance.now() + 1800); tone(220, .2, 'square', .06); return; }
+      grid[r][c] = null; fuses.delete(k);
+      P.burst(c * S + S / 2, r * S + S / 2, 14, { square: true, size: 12, speed: 5, colors: blockColors(b) });
+      tone(150 + Math.random() * 60, .12, 'square', .07);
+      if (b === 'diamond' || b === 'gold') { popEmoji(c * S + S / 2, r * S, b === 'diamond' ? '💎' : '⭐'); tone(1046, .3, 'triangle', .1); }
+    } else {
+      if (grid[r][c] === tool) return;
+      grid[r][c] = tool; tone(noteFor(x), .09, 'triangle', .09);
+      P.burst(c * S + S / 2, r * S + S / 2, 5, { square: true, size: 8, speed: 3, colors: blockColors(tool) });
+      if (tool === 'tnt') fuses.set(k, performance.now() + 2500);
+    }
+  }
+  function blockColors(b) { const d = BLOCKS[b].t.getContext('2d').getImageData(4, 8, 1, 1).data; return [`rgb(${d[0]},${d[1]},${d[2]})`, '#fff']; }
+  function explode(r0, c0) {
+    noise(.9, .35); tone(70, .6, 'sawtooth', .12);
+    for (let r = r0 - 2; r <= r0 + 2; r++) for (let c = c0 - 2; c <= c0 + 2; c++) {
+      if (r < 0 || r >= ROWS || c < 0 || c >= COLS || Math.hypot(r - r0, c - c0) > 2.4) continue;
+      const b = grid[r][c]; const k = r + ',' + c;
+      if (b === 'tnt' && !(r === r0 && c === c0)) { if (!fuses.has(k)) fuses.set(k, performance.now() + 250); continue; }
+      if (b) P.burst(c * S + S / 2, r * S + S / 2, 6, { square: true, size: 14, speed: 9, up: 4, colors: blockColors(b) });
+      grid[r][c] = null; fuses.delete(k);
+    }
+    P.burst(c0 * S + S / 2, r0 * S + S / 2, 60, { speed: 11, colors: ['#fff', '#ffd23f', '#ff7b00', '#555'] });
+    shakeUntil = performance.now() + 400;
+  }
+  let shakeUntil = 0;
+  const offs = [
+    listen(cv, 'pointerdown', e => { painting = true; lastCell = ''; act(e.clientX, e.clientY, true); }),
+    listen(cv, 'pointermove', e => { if (painting && tool !== 'tnt') act(e.clientX, e.clientY, false); }),
+    listen(window, 'pointerup', () => painting = false),
+  ];
+  loop(() => {
+    const now = performance.now();
+    cx.save();
+    if (now < shakeUntil) cx.translate((Math.random() - .5) * 16, (Math.random() - .5) * 16);
+    const sky = cx.createLinearGradient(0, 0, 0, innerHeight); sky.addColorStop(0, '#78b8ff'); sky.addColorStop(1, '#c7e7ff');
+    cx.fillStyle = sky; cx.fillRect(-20, -20, innerWidth + 40, innerHeight + 40);
+    cx.fillStyle = '#fff6a0'; cx.fillRect(innerWidth - 300, 70, 110, 110);
+    cx.fillStyle = 'rgba(255,255,255,.92)';
+    for (const cl of clouds) { cl.x += .3; if (cl.x > innerWidth + 300) cl.x = -400; for (let i = 0; i < cl.w; i++) cx.fillRect(cl.x + i * 60, cl.y, 60, 40); cx.fillRect(cl.x + 60, cl.y - 30, 60 * (cl.w - 2), 30); }
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      const b = grid[r][c]; if (!b) continue;
+      const k = r + ',' + c, f = fuses.get(k);
+      if (f && now >= f) { explode(r, c); continue; }
+      cx.drawImage(BLOCKS[b].t, c * S, r * S, S, S);
+      if (f && Math.floor(now / 150) % 2) { cx.fillStyle = 'rgba(255,255,255,.7)'; cx.fillRect(c * S, r * S, S, S); }
+    }
+    P.draw(cx);
+    cx.restore();
+  });
+  return () => offs.forEach(f => f());
+} };
+
+// ---------- 2. Kopalnia ----------
+const Mine = { icon:'⛏️', name:'Kopalnia', bg:'#b0b0b0', run(root) {
+  const cv = makeCanvas(root), cx = cv.getContext('2d'); cx.imageSmoothingEnabled = false;
+  const S = 120, COLS = Math.floor(innerWidth / S), ROWS = Math.floor((innerHeight - 40) / S);
+  const ox = (innerWidth - COLS * S) / 2, oy = (innerHeight - ROWS * S) / 2 + 20;
+  const counts = { coal: 0, iron: 0, gold: 0, diamond: 0, emerald: 0 };
+  const cnt = document.createElement('div'); cnt.id = 'counter'; root.appendChild(cnt);
+  const showCounts = () => cnt.innerHTML = Object.entries(counts).map(([k, v]) => `<span>${ORES[k].icon}${v}</span>`).join('');
+  showCounts();
+  let cells;
+  function fill() {
+    cells = [];
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      const x = Math.random(); const ore = x < .04 ? 'diamond' : x < .07 ? 'emerald' : x < .14 ? 'gold' : x < .24 ? 'iron' : x < .38 ? 'coal' : 'stone';
+      cells.push({ r, c, ore, hp: 3, gone: false });
+    }
+  }
+  fill();
+  const P = particles();
+  const off = listen(cv, 'pointerdown', e => {
+    const c = Math.floor((e.clientX - ox) / S), r = Math.floor((e.clientY - oy) / S);
+    const cell = cells.find(k => k.r === r && k.c === c && !k.gone); if (!cell) return;
+    cell.hp--; tone(140 + cell.hp * 30, .1, 'square', .07);
+    const x = ox + c * S + S / 2, y = oy + r * S + S / 2;
+    P.burst(x, y, 6, { square: true, size: 10, speed: 4, colors: ['#777', '#999', '#555'] });
+    if (cell.hp <= 0) {
+      cell.gone = true;
+      if (cell.ore !== 'stone') { counts[cell.ore]++; showCounts(); popEmoji(x, y, ORES[cell.ore].icon); tone(ORES[cell.ore].freq, .25, 'triangle', .12); setTimeout(() => tone(ORES[cell.ore].freq * 1.5, .3, 'triangle', .1), 120); P.burst(x, y, 30, { speed: 7 }); }
+      else P.burst(x, y, 16, { square: true, size: 14, speed: 6, colors: ['#777', '#8a8a8a', '#666'] });
+      if (cells.every(k => k.gone)) { setTimeout(() => { fill(); tone(523, .2); tone(659, .2); tone(784, .4); }, 800); }
+    }
+  });
+  loop(() => {
+    cx.fillStyle = '#2b2118'; cx.fillRect(0, 0, innerWidth, innerHeight);
+    for (const k of cells) {
+      const x = ox + k.c * S, y = oy + k.r * S;
+      if (k.gone) { cx.fillStyle = '#3a2d20'; cx.fillRect(x, y, S, S); continue; }
+      cx.drawImage(ORES[k.ore].t, x, y, S, S);
+      if (k.hp < 3) { cx.strokeStyle = '#111'; cx.lineWidth = 6; cx.beginPath(); cx.moveTo(x + S * .2, y + S * .3); cx.lineTo(x + S * .5, y + S * .5); cx.lineTo(x + S * .4, y + S * .8); if (k.hp < 2) { cx.moveTo(x + S * .5, y + S * .5); cx.lineTo(x + S * .85, y + S * .35); cx.moveTo(x + S * .5, y + S * .5); cx.lineTo(x + S * .75, y + S * .85); } cx.stroke(); }
+    }
+    P.draw(cx);
+  });
+  return off;
+} };
+
+// ---------- 3. Farma zwierzątek ----------
+const Farm = { icon:'🐷', name:'Farma', bg:'#c8f5b8', run(root) {
+  const cv = makeCanvas(root), cx = cv.getContext('2d'); cx.imageSmoothingEnabled = false;
+  const KINDS = [['🐷', 392], ['🐮', 147], ['🐔', 784], ['🐑', 330], ['🐴', 196], ['🐰', 659], ['🐱', 523], ['🐶', 294]];
+  const ground = innerHeight * .45;
+  const mk = (x) => { const [e, f] = KINDS[Math.floor(Math.random() * KINDS.length)]; return { e, f, x: x ?? Math.random() * innerWidth, y: ground + 80 + Math.random() * (innerHeight - ground - 220), vx: (Math.random() < .5 ? -1 : 1) * (.6 + Math.random()), jump: 0, size: 110 + Math.random() * 40 }; };
+  const animals = Array.from({ length: 7 }, () => mk());
+  const P = particles();
+  const off = listen(cv, 'pointerdown', e => {
+    const hit = animals.find(a => Math.hypot(a.x - e.clientX, a.y - a.size / 2 - e.clientY) < a.size * .6);
+    if (hit) { hit.jump = 1; hit.vx *= -1; tone(hit.f, .3, 'sawtooth', .07); tone(hit.f * 1.5, .3, 'sine', .07); P.burst(hit.x, hit.y - hit.size, 8, { emoji: ['❤️', '💕', '💖'], speed: 4, up: 3 }); }
+    else if (e.clientY > ground) { if (animals.length > 16) animals.shift(); const a = mk(e.clientX); a.y = Math.max(ground + 80, e.clientY); a.jump = 1; animals.push(a); tone(noteFor(e.clientX), .2, 'triangle'); P.burst(e.clientX, e.clientY, 20, { emoji: ['✨', '🌸', '🌼'], speed: 5 }); }
+    else { P.burst(e.clientX, e.clientY, 10, { emoji: ['☀️', '🌈', '⭐', '☁️'], speed: 4 }); tone(noteFor(e.clientX) * 2, .2); }
+  });
+  let t = 0;
+  loop(() => {
+    t++;
+    const sky = cx.createLinearGradient(0, 0, 0, ground); sky.addColorStop(0, '#7cc4ff'); sky.addColorStop(1, '#d6f0ff');
+    cx.fillStyle = sky; cx.fillRect(0, 0, innerWidth, ground);
+    cx.fillStyle = '#ffe36e'; cx.beginPath(); cx.arc(innerWidth - 200, 140, 80, 0, Math.PI * 2); cx.fill();
+    cx.fillStyle = '#6dbb45'; cx.fillRect(0, ground, innerWidth, innerHeight - ground);
+    cx.fillStyle = '#5fa83a'; for (let i = 0; i < 40; i++) cx.fillRect((i * 97 + 13) % innerWidth, ground + ((i * 53) % (innerHeight - ground)), 18, 8);
+    cx.fillStyle = '#8b5a2b'; for (let x = 0; x < innerWidth; x += 120) cx.fillRect(x, ground - 40, 16, 70); cx.fillRect(0, ground - 30, innerWidth, 12); cx.fillRect(0, ground - 5, innerWidth, 12);
+    animals.sort((a, b) => a.y - b.y);
+    for (const a of animals) {
+      a.x += a.vx; if (a.x < 60 || a.x > innerWidth - 60) a.vx *= -1;
+      if (a.jump > 0) a.jump -= .03;
+      const jy = Math.sin(Math.max(0, a.jump) * Math.PI) * 90, bob = Math.abs(Math.sin(t / 8 + a.x / 50)) * 6;
+      cx.save(); cx.translate(a.x, a.y - jy - bob); if (a.vx > 0) cx.scale(-1, 1);
+      cx.font = `${a.size}px "Noto Color Emoji"`; cx.textAlign = 'center'; cx.fillText(a.e, 0, 0); cx.restore();
+    }
+    P.draw(cx);
+  });
+  return off;
+} };
+
+// ---------- 4. Pary (memory) ----------
+const Memory = { icon:'🃏', name:'Pary', bg:'#ffd6a5', run(root) {
+  const box = document.createElement('div'); box.id = 'memory'; root.appendChild(box);
+  box.style.background = '#6b4f2e';
+  const back = document.createElement('canvas'); back.width = back.height = 16; back.getContext('2d').drawImage(BLOCKS.grass.t, 0, 0);
+  const backUrl = back.toDataURL();
+  const PICS = ['🐷', '🐮', '🐔', '🐑', '💎', '⛏️'];
+  let open = [], lock = false;
+  function deal() {
+    box.innerHTML = ''; open = [];
+    const deck = [...PICS, ...PICS].sort(() => Math.random() - .5);
+    deck.forEach(p => {
+      const card = document.createElement('div'); card.className = 'card'; card.dataset.p = p;
+      card.innerHTML = `<div class="in"><div class="b" style="background-image:url(${backUrl})"></div><div class="f">${p}</div></div>`;
+      card.addEventListener('pointerdown', () => flip(card)); box.appendChild(card);
+    });
+  }
+  function flip(card) {
+    if (lock || card.classList.contains('open')) return;
+    card.classList.add('open'); open.push(card); tone(523 + open.length * 130, .12, 'triangle');
+    if (open.length === 2) {
+      lock = true;
+      const [a, b] = open;
+      if (a.dataset.p === b.dataset.p) {
+        setTimeout(() => { a.classList.add('done'); b.classList.add('done'); tone(784, .2); tone(1046, .35); const r = b.getBoundingClientRect(); popEmoji(r.left + r.width / 2, r.top, '⭐'); open = []; lock = false;
+          if ([...box.children].every(c => c.classList.contains('done'))) win(); }, 400);
+      } else setTimeout(() => { a.classList.remove('open'); b.classList.remove('open'); tone(200, .15, 'square', .05); open = []; lock = false; }, 1100);
+    }
+  }
+  function win() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, .3, 'triangle', .12), i * 150)); for (let i = 0; i < 12; i++) setTimeout(() => popEmoji(Math.random() * innerWidth, Math.random() * innerHeight, ['🎉', '⭐', '🏆', '💎'][i % 4]), i * 120); setTimeout(deal, 3000); }
+  deal();
+  return () => {};
+} };
+
+// ---------- 5. Malowanie ----------
+const Paint = { icon:'🎨', name:'Malowanie', bg:'#ffb3c7', run(root) {
+  const cv = makeCanvas(root, '#fffdf6'), cx = cv.getContext('2d');
+  let hue = 0, pix = false; const last = new Map();
+  const tools = document.createElement('div'); tools.className = 'side'; tools.style.cssText = 'top:20px;right:20px;display:flex;gap:16px';
+  tools.innerHTML = '<button class="roundBtn" style="background:#ffe08a">🌈</button><button class="roundBtn" style="background:#c8f5b8">🟩</button><button class="roundBtn" style="background:#ffd6d6">🧽</button>';
+  root.appendChild(tools);
+  const [bRain, bPix, bClear] = tools.children;
+  bRain.onpointerdown = e => { e.stopPropagation(); pix = false; tone(660, .1); };
+  bPix.onpointerdown = e => { e.stopPropagation(); pix = true; tone(760, .1); };
+  bClear.onpointerdown = e => { e.stopPropagation(); cx.clearRect(0, 0, cv.width, cv.height); noise(.3, .1); };
+  function draw(id, x, y) {
+    hue = (hue + 3) % 360; cx.fillStyle = cx.strokeStyle = `hsl(${hue} 90% 55%)`;
+    if (pix) { const S = 40; cx.fillRect(Math.floor(x / S) * S, Math.floor(y / S) * S, S, S); return; }
+    const p = last.get(id); cx.lineWidth = 36; cx.lineCap = 'round';
+    cx.beginPath(); cx.moveTo(p ? p.x : x, p ? p.y : y); cx.lineTo(x, y); cx.stroke(); last.set(id, { x, y });
+  }
+  const offs = [
+    listen(cv, 'pointerdown', e => { last.delete(e.pointerId); last.set(e.pointerId, null); draw(e.pointerId, e.clientX, e.clientY); tone(noteFor(e.clientX), .2, 'triangle', .1); }),
+    listen(cv, 'pointermove', e => { if (last.has(e.pointerId)) draw(e.pointerId, e.clientX, e.clientY); }),
+    listen(window, 'pointerup', e => last.delete(e.pointerId)),
+  ];
+  return () => offs.forEach(f => f());
+} };
+
+// ---------- 6. Bańki ----------
+const Bubbles = { icon:'🫧', name:'Bańki', bg:'#b3e5ff', run(root) {
+  const cv = makeCanvas(root, 'linear-gradient(#bfe9ff,#e9f8ff)'), cx = cv.getContext('2d'); const P = particles(); let t = 0;
+  const nb = (any) => { const r = 50 + Math.random() * 70; return { x: Math.random() * innerWidth, y: any ? Math.random() * innerHeight : innerHeight + r, r, vy: -(0.6 + Math.random() * 1.2), h: Math.random() * 360, w: Math.random() * 6 }; };
+  const bs = Array.from({ length: 14 }, () => nb(true));
+  const off = listen(cv, 'pointerdown', e => { for (let i = bs.length - 1; i >= 0; i--) { const b = bs[i]; if (Math.hypot(b.x - e.clientX, b.y - e.clientY) < b.r + 20) { P.burst(b.x, b.y, 25); tone(300 + (170 - b.r) * 6, .15, 'sine', .2); bs[i] = nb(false); break; } } });
+  loop(() => { t++; cx.clearRect(0, 0, innerWidth, innerHeight);
+    for (const b of bs) { b.y += b.vy; if (b.y < -b.r) Object.assign(b, nb(false)); const bx = b.x + Math.sin((t + b.w * 30) / 40) * 12;
+      const g = cx.createRadialGradient(bx - b.r / 3, b.y - b.r / 3, b.r / 8, bx, b.y, b.r); g.addColorStop(0, 'rgba(255,255,255,.9)'); g.addColorStop(.6, `hsla(${b.h},90%,70%,.35)`); g.addColorStop(1, `hsla(${b.h},90%,55%,.7)`);
+      cx.fillStyle = g; cx.beginPath(); cx.arc(bx, b.y, b.r, 0, Math.PI * 2); cx.fill(); }
+    P.draw(cx); });
+  return off;
+} };
+
+// ---------- 7. Fajerwerki ----------
+const Fireworks = { icon:'🎆', name:'Fajerwerki', bg:'#d9c2ff', run(root) {
+  const cv = makeCanvas(root, '#14123a'), cx = cv.getContext('2d'); const P = particles();
+  const rockets = [];
+  const off = listen(cv, 'pointerdown', e => { rockets.push({ x: e.clientX, y: innerHeight, ty: e.clientY, vy: -18 }); tone(300, .3, 'sine', .05); });
+  loop(() => { cx.fillStyle = 'rgba(20,18,58,.3)'; cx.fillRect(0, 0, innerWidth, innerHeight);
+    for (let i = rockets.length - 1; i >= 0; i--) { const r = rockets[i]; r.y += r.vy; cx.fillStyle = '#fff'; cx.fillRect(r.x - 3, r.y, 6, 18);
+      if (r.y <= r.ty) { rockets.splice(i, 1); P.burst(r.x, r.y, 90, { speed: 9 }); noise(.4, .12); tone(noteFor(r.x) * 2, .4, 'triangle', .06); } }
+    P.draw(cx); });
+  return off;
+} };
+
+// ---------- 8. Gwiazdki ----------
+const Stars = { icon:'⭐', name:'Gwiazdki', bg:'#fff0a8', run(root) {
+  const cv = makeCanvas(root, '#fff8e1'), cx = cv.getContext('2d'); const P = particles();
+  const off = listen(cv, 'pointerdown', e => { P.burst(e.clientX, e.clientY, 14, { emoji: ['⭐', '🌟', '✨', '💖', '🌈', '🦄'], speed: 8, up: 4 }); tone(noteFor(e.clientX) * 2, .3); });
+  const off2 = listen(cv, 'pointermove', e => { if (e.pressure > 0 && Math.random() < .3) P.burst(e.clientX, e.clientY, 1, { emoji: ['✨', '⭐'], speed: 2 }); });
+  loop(() => { cx.clearRect(0, 0, innerWidth, innerHeight); P.draw(cx); });
+  return () => { off(); off2(); };
+} };
+
+// ---------- 9. Zwierzątka ----------
+const Animals = { icon:'🐶', name:'Zwierzątka', bg:'#c8e6ff', run(root) {
+  const cv = makeCanvas(root, '#e9f7ff');
+  const A = [['🐶', 330], ['🐱', 523], ['🐮', 147], ['🐷', 392], ['🐸', 220], ['🦁', 110], ['🐵', 587], ['🐔', 659], ['🐘', 98], ['🦄', 784], ['🐻', 165], ['🐰', 698]];
+  return listen(cv, 'pointerdown', e => { const [a, f] = A[Math.floor(Math.random() * A.length)]; popEmoji(e.clientX, e.clientY, a, 160); tone(f, .35, 'sawtooth', .07); tone(f * 1.5, .35, 'sine', .07); });
+} };
+
+// ---------- 10. Pianino klocków ----------
+const Piano = { icon:'🎹', name:'Pianino', bg:'#ffc9a8', run(root) {
+  const cv = makeCanvas(root, '#2a2522'), cx = cv.getContext('2d'); cx.imageSmoothingEnabled = false;
+  const keys = ['grass', 'dirt', 'stone', 'wood', 'planks', 'gold', 'diamond', 'leaves'];
+  const notes = [262, 294, 330, 349, 392, 440, 494, 523];
+  const W = innerWidth / keys.length, lit = new Array(keys.length).fill(0); const P = particles();
+  const press = (x) => { const i = Math.min(keys.length - 1, Math.floor(x / W)); lit[i] = 1; tone(notes[i], .5, 'triangle', .14); P.burst(i * W + W / 2, innerHeight * .25, 8, { emoji: ['🎵', '🎶'], speed: 4, up: 4 }); };
+  const held = new Map();
+  const offs = [
+    listen(cv, 'pointerdown', e => { held.set(e.pointerId, Math.floor(e.clientX / W)); press(e.clientX); }),
+    listen(cv, 'pointermove', e => { if (!held.has(e.pointerId)) return; const i = Math.floor(e.clientX / W); if (i !== held.get(e.pointerId)) { held.set(e.pointerId, i); press(e.clientX); } }),
+    listen(window, 'pointerup', e => held.delete(e.pointerId)),
+  ];
+  loop(() => { cx.fillStyle = '#2a2522'; cx.fillRect(0, 0, innerWidth, innerHeight);
+    keys.forEach((k, i) => { const y = innerHeight * .4 - lit[i] * 30; cx.drawImage(BLOCKS[k].t, i * W + 8, y, W - 16, innerHeight * .55); if (lit[i] > 0) { cx.fillStyle = `rgba(255,255,255,${lit[i] * .5})`; cx.fillRect(i * W + 8, y, W - 16, innerHeight * .55); lit[i] = Math.max(0, lit[i] - .04); } });
+    P.draw(cx); });
+  return () => offs.forEach(f => f());
+} };
+
+const GAMES = [Build, Mine, Farm, Memory, Piano, Paint, Bubbles, Fireworks, Stars, Animals];
+const tiles = document.getElementById('tiles');
+GAMES.forEach(g => { const t = document.createElement('button'); t.className = 'tile'; t.style.background = g.bg; t.innerHTML = `${g.icon}<span>${g.name}</span>`; t.addEventListener('pointerdown', () => start(g)); tiles.appendChild(t); });
+addEventListener('contextmenu', e => e.preventDefault());
+
+// Po 5 minutach bez dotyku wracamy do kalendarza
+let lastTouch = Date.now();
+addEventListener('pointerdown', () => (lastTouch = Date.now()), true);
+setInterval(() => { if (Date.now() - lastTouch > 5 * 60_000) location.href = '/'; }, 10_000);
+</script>
+</body>
+</html>

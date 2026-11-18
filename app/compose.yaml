@@ -1,0 +1,73 @@
+# Ustawienia w pliku .env obok (wzór: .env.example). Settings live in .env (see .env.example).
+name: kalendarz
+services:
+  kalendarz:
+    build:
+      context: .
+    image: kalendarz:latest
+    restart: unless-stopped
+    # Logi kontenera z limitem (3 × 10 MB) – kiosk działa miesiącami bez opieki. Container log size cap.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      # Tylko lokalnie – do tailnetu wystawia to `tailscale serve`. Kiosk i agent ekranu
+      # używają tego samego HOST_PORT (kiosk/install.sh zapisuje go w /etc/kiosk/kiosk.conf).
+      - "127.0.0.1:${HOST_PORT:-3000}:3000"
+    volumes:
+      - ./data:/data
+      # Kopie zapasowe na NAS: udział zamontowany na hoście (np. /mnt/nas/kalendarz) jako folder
+      # w kontenerze; w panelu → Kopie zapasowe dodaj miejsce „Folder” z adresem /backup.
+      # Backups on a NAS share mounted on the host – see docs/backup.md.
+      # - /mnt/nas/kalendarz:/backup
+      # Tailscale whois: login z `tailscale serve` sprawdzany w tailscaled (README → Bezpieczeństwo). Odkomentuj
+      # tylko, gdy Tailscale działa na hoście – brakujące gniazdo zablokuje start kontenera (create_host_path: false).
+      # Verify Tailscale logins via tailscaled's LocalAPI; uncomment only when tailscaled runs on the host.
+      # - type: bind
+      #   source: /var/run/tailscale/tailscaled.sock
+      #   target: /var/run/tailscale/tailscaled.sock
+      #   read_only: true
+      #   bind:
+      #     create_host_path: false
+    # DNS kontenera. Tailscale (MagicDNS) ustawia na hoście resolver 100.100.100.100, którego nie widać
+    # z sieci Dockera – bez stałego DNS kontener po restarcie Tailscale nie rozwiąże żadnej nazwy.
+    # Publiczne serwery nie znają jednak nazw z sieci domowej (nas.fritz.box, homeassistant.lan),
+    # a nazw mDNS (*.local) w kontenerze nie ma nigdy. Do wyboru:
+    #   - adresy IP w panelu (Home Assistant, WebDAV) – najprościej, zalecane,
+    #   - DNS1=<IP routera> w .env – router zna nazwy z LAN i przekazuje resztę dalej,
+    #   - extra_hosts niżej – stałe nazwy wpisane ręcznie.
+    # Tailscale MagicDNS (100.100.100.100) is unreachable from Docker networks, so DNS is fixed here.
+    # Public resolvers don't know LAN names and mDNS (*.local) never works in containers: use IP addresses,
+    # set DNS1 to your router's IP in .env, or add names under extra_hosts.
+    dns:
+      - ${DNS1:-1.1.1.1}
+      - ${DNS2:-9.9.9.9}
+    # extra_hosts:
+    #   - "nas.local:192.168.1.10"
+    #   - "homeassistant.local:192.168.1.20"
+    environment:
+      ADMIN_LOGINS: ${ADMIN_LOGINS:-}
+      TRUSTED_ORIGINS: ${TRUSTED_ORIGINS:-http://localhost:${HOST_PORT:-3000}}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-}
+      TZ: ${TZ:-Europe/Berlin}
+      BACKUP_DIR: ${BACKUP_DIR:-}
+      # --- p4: security --- logowanie i token API (opis w .env.example i README → Bezpieczeństwo)
+      AUTH_MODE: ${AUTH_MODE:-tailscale}
+      AUTH_PROXY_HEADER: ${AUTH_PROXY_HEADER:-}
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-}
+      KIOSK_IPS: ${KIOSK_IPS:-}
+      KIOSK_LOCAL: ${KIOSK_LOCAL:-1}
+      AUTH_PASSWORD_HASH: ${AUTH_PASSWORD_HASH:-}
+      SESSION_SECRET: ${SESSION_SECRET:-}
+      SESSION_DAYS: ${SESSION_DAYS:-30}
+      COOKIE_SECURE: ${COOKIE_SECURE:-auto}
+      API_TOKEN: ${API_TOKEN:-}
+      # --- demo --- tryb demo z fikcyjną rodziną (docs/demo.md); własna baza w data/demo/
+      DEMO: ${DEMO:-}
+      DEMO_LANG: ${DEMO_LANG:-pl}
+      DEMO_THEME: ${DEMO_THEME:-}
+      DEMO_RESET: ${DEMO_RESET:-}
+      TAILSCALE_WHOIS: ${TAILSCALE_WHOIS:-auto}
